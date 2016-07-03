@@ -1,14 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var FbMessager = require('./api/fb_messanger');
-var EbayApi = require('./api/ebay');
-var searchHandler = require('./search_handler');
+var Testers = require('./testers');
 
 router.get('/', function(req, res) {
     res.sendfile(__dirname +'/views/index.html')
 });
 
-router.route('/facebook_callback')
+router.route('/facebook/receive')
 
   .get(function(req, res) {
       if (req.query['hub.verify_token'] === 'orenCross') {
@@ -24,14 +22,12 @@ router.route('/facebook_callback')
         sender = event.sender.id;
         if (event.message) {
           message = event.message;
+            console.log(message);
           if (message.text) {
             text = message.text;
             console.log(`Incoming message from ${sender}: ${text}`);
             // Handle a text message from this sender
-            EbayApi.search([text], {
-              callback: searchHandler.respondWithItems,
-              sender: sender
-            });
+            Testers.doSomething(sender, message);
           } else if (message.attachments) {
             console.log('Incoming attachments:');
             attachments = message.attachments;
